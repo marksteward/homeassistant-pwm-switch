@@ -1,7 +1,7 @@
 Heated blanket automation
 =========================
 
-Home Assistant scripts to control a switch using PWM, based on a duty cycle percentage. This allows you to set your heated blanket to 100% and have it warm up before bedtime (or maybe in the morning), while not overwarming during the night.
+Home Assistant scripts to control a switch using PWM, based on a duty cycle percentage. This allows you to set your heated blanket to full and have it warm up before bedtime (or maybe in the morning), while not overwarming during the night.
 
 I haven't turned this into a blueprint yet, so please create:
 
@@ -11,4 +11,4 @@ I haven't turned this into a blueprint yet, so please create:
 
 Then create the automations, pointing at your heated blanket switch. You can either set the duty cycle for each automation, or point at the input_number.
 
-You can then use a schedule or automation trigger to set the input_select to Warmup at bed time.
+You can then use a schedule or automation trigger to set the input_select to Warmup at bed time, and Idle in the morning. I recommend putting everything in a dedicated category.
