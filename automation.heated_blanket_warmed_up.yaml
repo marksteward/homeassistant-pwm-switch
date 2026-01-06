@@ -1,0 +1,21 @@
+alias: Heated blanket warmed up
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - input_select.heated_blanket
+    to:
+      - Warmup
+    for:
+      hours: 0
+      minutes: 20
+      seconds: 0
+conditions: []
+actions:
+  - action: input_select.select_option
+    data:
+      option: Sustain
+    target:
+      entity_id: input_select.heated_blanket
+mode: single
+

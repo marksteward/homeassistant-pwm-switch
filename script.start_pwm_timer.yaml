@@ -1,0 +1,99 @@
+alias: PWM switch
+sequence:
+  - variables:
+      pwm: |-
+        {% if duty_cycle_entity %}
+        {% set duty_cycle_pct = states(duty_cycle_entity) | int %}
+        {% endif %}
+
+        {% if duty_cycle_pct == 0 %}
+          switch.turn_off 0
+        {% else %}
+          
+          {% if duty_cycle_pct == 100 %}
+            {% set total_s = 3600 %}
+            {% set off_edge_s = 3600 - 60 %}
+            
+          {% else %}
+            {% set smallest_interval_pct = min(duty_cycle_pct, 100 - duty_cycle_pct)
+          %}
+            {% set unit_duration_s = (unit_duration.hours * 60 + unit_duration.minutes) * 60 + unit_duration.seconds %}
+            {% set total_s = 100 / smallest_interval_pct * unit_duration_s %}
+            {% set off_edge_s = total_s * duty_cycle_pct / 100 %}
+          {% endif %}
+          
+          {% set n = now() %}
+          {% set phase_s = int(n.timestamp()) % total_s %}
+          
+          {# {{ off_edge_s }} / {{ total_s }} #}
+          {% if phase_s < off_edge_s %}
+            switch.turn_on {{ off_edge_s - phase_s }}
+          {% else %}
+            switch.turn_off {{ total_s - phase_s }}
+          {% endif %}
+        {% endif %}
+  - alias: Set switch to appropriate state
+    action: "{{ pwm.split()[0] }}"
+    target:
+      entity_id: "{{ switch }}"
+  - alias: Cancel current timer
+    action: timer.cancel
+    target:
+      entity_id:
+        - "{{ timer }}"
+    data: {}
+  - alias: Start timer to update at the next edge
+    action: timer.start
+    target:
+      entity_id:
+        - "{{ timer }}"
+    data:
+      duration: "{{ int(pwm.split()[1]) }}"
+description: ""
+icon: mdi:timer-play
+fields:
+  timer:
+    selector:
+      entity: {}
+    name: Timer
+    required: true
+    description: e.g. timer.heated_blanket_timer
+    default: timer.heated_blanket_timer
+  unit_duration:
+    selector:
+      duration: {}
+    name: Unit duration
+    description: >-
+      How long the shortest PWM interval is, e.g. 6m will make a 10% duty cycle
+      last an hour, and a 50% last 12m.
+    default:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    required: true
+  switch:
+    selector:
+      entity: {}
+    name: Switch
+    description: Entity to PWM on/off, e.g. switch.heated_blanket
+    required: true
+    default: switch.heated_blanket
+  duty_cycle_entity:
+    selector:
+      entity: {}
+    name: Duty cycle entity
+    description: >-
+      Entity that holds the duty cycle percent, e.g.
+      input_number.heated_blanket_level
+    required: false
+  duty_cycle_pct:
+    selector:
+      number:
+        min: 0
+        max: 100
+        step: 10
+    name: Duty cycle
+    description: Duty cycle for PWM, e.g. 50%
+    default: 50
+    required: false
+

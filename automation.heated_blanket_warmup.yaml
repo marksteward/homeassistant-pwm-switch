@@ -1,0 +1,28 @@
+alias: Heated blanket warmup
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - input_select.heated_blanket
+    to: Warmup
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.heated_blanket_timer
+conditions:
+  - condition: state
+    entity_id: input_select.heated_blanket
+    state: Warmup
+actions:
+  - action: script.start_pwm_timer
+    metadata: {}
+    data:
+      unit_duration:
+        hours: 0
+        minutes: 1
+        seconds: 0
+      timer: timer.heated_blanket_timer
+      switch: switch.heated_blanket
+      duty_cycle_pct: 100
+mode: single
+

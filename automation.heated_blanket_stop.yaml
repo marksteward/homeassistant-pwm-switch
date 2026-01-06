@@ -1,0 +1,32 @@
+alias: Heated blanket stop
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - input_select.heated_blanket
+    from: Sustain
+  - trigger: state
+    entity_id:
+      - input_select.heated_blanket
+    from: Warmup
+conditions:
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: input_select.heated_blanket
+        state: Sustain
+      - condition: state
+        entity_id: input_select.heated_blanket
+        state: Warmup
+actions:
+  - action: timer.cancel
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.heated_blanket_timer
+  - action: switch.turn_off
+    target:
+      entity_id: switch.heated_blanket
+    data: {}
+mode: single
+

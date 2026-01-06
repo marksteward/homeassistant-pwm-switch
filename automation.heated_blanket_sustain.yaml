@@ -1,0 +1,28 @@
+alias: Heated blanket sustain
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - input_select.heated_blanket
+    to: Sustain
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.heated_blanket_timer
+conditions:
+  - condition: state
+    entity_id: input_select.heated_blanket
+    state: Sustain
+actions:
+  - action: script.start_pwm_timer
+    metadata: {}
+    data:
+      timer: timer.heated_blanket_timer
+      unit_duration:
+        hours: 0
+        minutes: 2
+        seconds: 0
+      switch: switch.heated_blanket
+      duty_cycle_entity: input_number.heated_blanket_level
+mode: single
+
